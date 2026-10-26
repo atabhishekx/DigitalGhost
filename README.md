@@ -9,37 +9,44 @@
 
 DigitalGhost is built for security analysts and researchers who need a transparent, explainable view of identity risk — not a black-box score. Every signal is separately visible and explainable:
 
-- **Rule engine** — transparent, configurable rules for terminated/suspended identities, inactivity, and unused high-privilege access. Each triggered rule lists its reason and points.
-- **Behavioral ML** — a local scikit-learn Isolation Forest trained on identity activity features. Its percentile is a relative anomaly signal, not a probability.
-- **Permission graph** — graph analytics over identities, roles, permissions, and resources to surface high-privilege assignments, blast radius, and multi-resource exposure.
-- **Read-only AI Investigator** — a tool-using investigation workflow that gathers identity-context, rule, graph, and behavior evidence, saves evidence-backed reports, and can optionally draft a Gemini summary (disabled by default).
-- **Audit history** — append-oriented, hash-linked log of investigations, model changes, dataset imports, and analyst decisions with an integrity check.
+- **Rule engine** — transparent, configurable rules for terminated/suspended identities, inactivity, and unused high-privilege access.
+- **Behavioral ML** — a local scikit-learn Isolation Forest trained on identity activity features.
+- **Permission graph** — graph analytics over identities, roles, permissions, and resources.
+- **Read-only AI Investigator** — evidence-backed investigation with optional Gemini summary.
+- **Audit history** — append-oriented, hash-linked log of investigations, model changes, and analyst decisions.
 
-## Screenshots
+## Screenshots & diagrams
 
 ### Identity lifecycle
-
 ![Identity lifecycle](assets/identity-lifecycle.png)
 
 ### Implemented system architecture
-
 ![System architecture](assets/system-architecture.png)
 
 ### Identity access graph
-
 ![Permission graph](assets/identity-access-graph.png)
 
-### Synthetic benchmark pipeline
+### Use case diagram
+![Use case diagram](assets/use-case-diagram.png)
 
+### Project milestone sequence
+![Milestone sequence](assets/milestone-sequence.png)
+
+### Risk score fusion workflow
+![Risk score fusion](assets/risk-score-fusion.png)
+
+### Synthetic benchmark pipeline
 ![Benchmark pipeline](assets/synthetic-benchmark.png)
 
 ### Traditional vs contextual analysis
-
 ![Traditional vs contextual](assets/traditional-vs-contextual.png)
+
+### Human review & audit workflow
+![Human review & audit](assets/human-review-audit.png)
 
 ## Key features
 
-- Multi-page Streamlit UI with a consistent dark teal/blue theme across Overview, Risk Explorer, Identity Graph, AI Investigator, Data & Models, and Audit History workspaces.
+- Multi-page Streamlit UI across Overview, Risk Explorer, Identity Graph, AI Investigator, Data & Models, and Audit History workspaces.
 - Stable typed identity, role, permission, assignment, event, and resource IDs — duplicate display names never merge graph nodes.
 - Multiple assignments per identity aggregated for ML features without silently dropping data.
 - Persisted Isolation Forest model with atomic artifact replacement, feature schema metadata, and artifact checksum. Scenario labels are excluded from model features.
@@ -70,7 +77,7 @@ Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
 
 ## Requirements
 
-Python 3.10–3.12 recommended, a modern browser, and the packages in `requirements.txt`. No SQL server, external database, or API key is required for the core application. The first run creates local data and trains a local anomaly model.
+Python 3.10–3.12 recommended, a modern browser, and the packages in `requirements.txt`. No SQL server, external database, or API key is required for the core application.
 
 Optional Gemini summaries require a `GEMINI_API_KEY`. The key is never written to project data files — do not commit secrets.
 
@@ -80,15 +87,15 @@ Application-owned state lives under the project directory:
 
 - `data/processed/` — identities, assignments, roles, permissions, activity events
 - `data/raw/synthetic/` — synthetic dataset manifest
-- `data/raw/public/` — imported public research CSVs (kept separate from synthetic identities)
-- `data/state/` — investigations, analyst decisions, evaluation reports, hash-linked audit history
+- `data/raw/public/` — imported public research CSVs
+- `data/state/` — investigations, analyst decisions, evaluation reports, audit history
 - `models/` — saved Isolation Forest artifact and metadata
 
-Generated data and local model artifacts are ignored by Git but remain on disk. Back up `data/` and `models/` if you want to preserve them across project copies.
+Generated data and local model artifacts are ignored by Git but remain on disk.
 
 ## Safety boundaries
 
-The investigator is **read-only**. It can gather local evidence and draft recommendations, but it cannot revoke access or change permissions. LLM summaries can be wrong and must be checked against the structured evidence. This prototype does not connect to a live identity provider.
+The investigator is **read-only**. It cannot revoke access or change permissions. LLM summaries can be wrong and must be checked against evidence. This prototype does not connect to a live identity provider.
 
 ## Project structure
 
@@ -97,50 +104,35 @@ digitalghost/
 ├── app.py                    # Streamlit UI entry point
 ├── requirements.txt          # Python dependencies
 ├── README.md                 # Project documentation
-├── .env                      # Local environment (not committed)
 ├── .gitignore                # Git ignore rules
-├── assets/                   # Images for README
+├── assets/                   # README images
 │   ├── identity-lifecycle.png
 │   ├── system-architecture.png
 │   ├── identity-access-graph.png
+│   ├── use-case-diagram.png
+│   ├── milestone-sequence.png
+│   ├── risk-score-fusion.png
 │   ├── synthetic-benchmark.png
-│   └── traditional-vs-contextual.png
+│   ├── traditional-vs-contextual.png
+│   └── human-review-audit.png
 ├── data/                     # Local runtime data (not committed)
-│   ├── processed/
-│   ├── raw/
-│   └── state/
 ├── models/                   # Trained ML artifacts (not committed)
 ├── src/digitalghost/         # Core Python package
-│   ├── __init__.py
-│   ├── agent.py              # Read-only investigation orchestrator
-│   ├── analysis.py           # Signal orchestration
-│   ├── data.py               # Data persistence and validation
-│   ├── evaluation.py         # Synthetic benchmark evaluation
-│   ├── fusion.py             # Signal fusion logic
-│   ├── graph_analysis.py     # Permission graph analytics
-│   ├── ml.py                 # Isolation Forest model
-│   ├── public_import.py      # Public CSV import
-│   ├── risk.py               # Rule engine
-│   ├── storage.py            # File-backed storage
-│   └── tools.py              # Investigation tools
 ├── tests/                    # Pytest test suite
-└── docs/
-    └── ARCHITECTURE.md       # Architecture notes
+├── docs/ARCHITECTURE.md      # Architecture notes
+└── PBL Presentation/         # College project report & slides
 ```
 
 ## License
 
-This is a college project prototype for educational and research purposes. It is not a production security tool.
+College project prototype for educational and research purposes. Not a production security tool.
 
-## Git setup (new repository)
+## Push to a new GitHub repository
 
 ```powershell
-git init
-git add .
-git commit -m "Initial commit: DigitalGhost local identity risk intelligence"
 git branch -M main
 git remote add origin https://github.com/YOUR_USERNAME/digitalghost.git
 git push -u origin main
 ```
 
-Replace `YOUR_USERNAME` with your GitHub username and create the empty `digitalghost` repository on GitHub first.
+Create the empty `digitalghost` repository on GitHub first, then replace `YOUR_USERNAME` with your GitHub username.
