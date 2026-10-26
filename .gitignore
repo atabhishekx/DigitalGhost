@@ -1,0 +1,20 @@
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.streamlit/secrets.toml
+.env
+*.tmp
+
+# Local generated data and application state remain on disk but are not committed.
+data/processed/*
+!data/processed/.gitkeep
+data/raw/synthetic/*
+!data/raw/synthetic/.gitkeep
+data/raw/public/*
+!data/raw/public/.gitkeep
+data/state/*
+!data/state/.gitkeep
+models/*
+!models/.gitkeep
